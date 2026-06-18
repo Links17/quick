@@ -203,10 +203,10 @@ final class QuickAppModel: NSObject, ObservableObject {
             return
         }
 
-        let item = NSStatusBar.system.statusItem(withLength: 24)
-        item.button?.image = nil
-        item.button?.title = "Q"
-        item.button?.font = .systemFont(ofSize: NSFont.systemFontSize, weight: .semibold)
+        let item = NSStatusBar.system.statusItem(withLength: 28)
+        item.button?.image = makeStatusBarIcon()
+        item.button?.imagePosition = .imageOnly
+        item.button?.title = ""
         item.button?.toolTip = "Quick"
 
         let menu = NSMenu()
@@ -249,6 +249,37 @@ final class QuickAppModel: NSObject, ObservableObject {
 
         item.menu = menu
         statusItem = item
+    }
+
+    private func makeStatusBarIcon() -> NSImage {
+        let size = NSSize(width: 22, height: 18)
+        let image = NSImage(size: size, flipped: false) { rect in
+            let tile = NSRect(x: 1, y: 1, width: rect.width - 2, height: rect.height - 2)
+            let path = NSBezierPath(roundedRect: tile, xRadius: 5, yRadius: 5)
+            NSColor.white.setFill()
+            path.fill()
+            NSColor.black.withAlphaComponent(0.18).setStroke()
+            path.lineWidth = 0.8
+            path.stroke()
+
+            let font = NSFont.systemFont(ofSize: 13, weight: .bold)
+            let text = NSAttributedString(
+                string: "Q",
+                attributes: [
+                    .font: font,
+                    .foregroundColor: NSColor.black,
+                ]
+            )
+            let textSize = text.size()
+            text.draw(at: NSPoint(
+                x: rect.midX - textSize.width / 2,
+                y: rect.midY - textSize.height / 2 - 0.5
+            ))
+            return true
+        }
+        image.isTemplate = false
+        image.accessibilityDescription = "Quick"
+        return image
     }
 
     @objc private func translateClipboardFromMenu() {

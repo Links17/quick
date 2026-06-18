@@ -1,5 +1,4 @@
 import AppKit
-import CoreText
 import Foundation
 
 let outputDirectory = URL(fileURLWithPath: CommandLine.arguments.dropFirst().first ?? "AppBundle")
@@ -21,27 +20,6 @@ let iconSizes: [(name: String, pixels: Int)] = [
     ("icon_512x512.png", 512),
     ("icon_512x512@2x.png", 1024),
 ]
-
-func makeGlyphPath(fontSize: CGFloat) -> CGPath {
-    let font = CTFontCreateWithName("HelveticaNeue-Bold" as CFString, fontSize, nil)
-    var character: UniChar = 81
-    var glyph = CGGlyph()
-    guard CTFontGetGlyphsForCharacters(font, &character, &glyph, 1),
-          let path = CTFontCreatePathForGlyph(font, glyph, nil) else {
-        fatalError("Unable to create Q glyph path.")
-    }
-    return path
-}
-
-func centeredPath(_ path: CGPath, in rect: CGRect) -> CGPath {
-    let bounds = path.boundingBoxOfPath
-    let scale = min(rect.width / bounds.width, rect.height / bounds.height)
-    var transform = CGAffineTransform.identity
-        .translatedBy(x: rect.midX, y: rect.midY)
-        .scaledBy(x: scale, y: -scale)
-        .translatedBy(x: -bounds.midX, y: -bounds.midY)
-    return path.copy(using: &transform) ?? path
-}
 
 func drawQ(
     in rect: CGRect,
@@ -122,17 +100,11 @@ func drawIcon(size: Int, name: String) throws {
     let unit = CGFloat(size)
     drawQ(
         in: canvas,
-        fontSize: unit * 0.68,
-        offset: CGPoint(x: -unit * 0.040, y: unit * 0.030),
+        fontSize: unit * 0.72,
+        offset: CGPoint(x: 0, y: unit * 0.010),
         fillColor: .clear,
         strokeColor: .black,
-        strokeWidth: 4
-    )
-    drawQ(
-        in: canvas,
-        fontSize: unit * 0.52,
-        offset: CGPoint(x: unit * 0.060, y: -unit * 0.042),
-        fillColor: .black
+        strokeWidth: 5
     )
 
     NSGraphicsContext.restoreGraphicsState()
