@@ -1,6 +1,7 @@
 import AppKit
 import ApplicationServices
 import QuickCore
+import QuickOCR
 import SwiftUI
 
 final class AppDelegate: NSObject, NSApplicationDelegate {

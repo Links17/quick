@@ -12,6 +12,10 @@ let package = Package(
             name: "QuickCore",
             targets: ["QuickCore"]
         ),
+        .library(
+            name: "QuickOCR",
+            targets: ["QuickOCR"]
+        ),
         .executable(
             name: "Quick",
             targets: ["Quick"]
@@ -28,17 +32,25 @@ let package = Package(
         .target(
             name: "QuickCore"
         ),
-        .executableTarget(
-            name: "Quick",
+        .target(
+            name: "QuickOCR",
             dependencies: [
                 "QuickCore",
                 .product(name: "onnxruntime", package: "onnxruntime-swift-package-manager")
             ]
         ),
         .executableTarget(
+            name: "Quick",
+            dependencies: [
+                "QuickCore",
+                "QuickOCR"
+            ]
+        ),
+        .executableTarget(
             name: "QuickOCRInspect",
             dependencies: [
                 "QuickCore",
+                "QuickOCR",
                 .product(name: "onnxruntime", package: "onnxruntime-swift-package-manager")
             ]
         ),

@@ -1,5 +1,6 @@
 import Foundation
 import OnnxRuntimeBindings
+import QuickOCR
 
 struct ModelInspection {
     let path: String
@@ -17,19 +18,37 @@ func inspectModel(path: String) throws -> ModelInspection {
     return ModelInspection(path: path, inputs: inputs, outputs: outputs)
 }
 
-let arguments = CommandLine.arguments.dropFirst()
-let root = arguments.first ?? "AppBundle/Resources/OCR"
-let modelPaths = [
-    "\(root)/ppocrv6_tiny_det.onnx",
-    "\(root)/ppocrv6_tiny_rec.onnx",
-]
+let arguments = Array(CommandLine.arguments.dropFirst())
+let command = arguments.first ?? "inspect"
+let root = arguments.dropFirst().first ?? "AppBundle/Resources/OCR"
 
 do {
-    for modelPath in modelPaths {
-        let inspection = try inspectModel(path: modelPath)
-        print("model: \(inspection.path)")
-        print("inputs: \(inspection.inputs.joined(separator: ","))")
-        print("outputs: \(inspection.outputs.joined(separator: ","))")
+    switch command {
+    case "inspect":
+        let modelPaths = [
+            "\(root)/ppocrv6_tiny_det.onnx",
+            "\(root)/ppocrv6_tiny_rec.onnx",
+        ]
+        for modelPath in modelPaths {
+            let inspection = try inspectModel(path: modelPath)
+            print("model: \(inspection.path)")
+            print("inputs: \(inspection.inputs.joined(separator: ","))")
+            print("outputs: \(inspection.outputs.joined(separator: ","))")
+        }
+    case "recognize":
+        guard arguments.count >= 3 else {
+            fputs("Usage: QuickOCRInspect recognize <OCR resource dir> <image path>\n", stderr)
+            exit(2)
+        }
+        let resourceDirectory = URL(fileURLWithPath: arguments[1])
+        let imageURL = URL(fileURLWithPath: arguments[2])
+        let data = try Data(contentsOf: imageURL)
+        let service = try PaddleONNXOCRService(resourceDirectory: resourceDirectory)
+        let text = try await service.recognizeText(in: data)
+        print(text)
+    default:
+        fputs("Usage: QuickOCRInspect inspect [OCR resource dir]\n       QuickOCRInspect recognize <OCR resource dir> <image path>\n", stderr)
+        exit(2)
     }
 } catch {
     fputs("QuickOCRInspect failed: \(error.localizedDescription)\n", stderr)
