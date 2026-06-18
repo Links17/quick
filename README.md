@@ -1,6 +1,6 @@
 # Quick
 
-Quick is a lightweight macOS menu bar translator built around one gesture: select text anywhere, press `cmd+c+c`, and get an editable translation popup.
+Quick is a lightweight macOS menu bar translator and OCR utility built around one gesture: copy text or an image anywhere, press `cmd+c+c`, and get a focused popup.
 
 It is designed for people who like instant shortcut translation but want a small native tool with configurable OpenAI-compatible providers.
 
@@ -9,6 +9,8 @@ It is designed for people who like instant shortcut translation but want a small
 - Native Swift macOS menu bar app.
 - Default shortcut: `cmd+c+c`.
 - No keyboard monitoring permission needed for the default shortcut.
+- Text input goes through OpenAI-compatible translation.
+- Image input goes through local PP-OCRv6 tiny OCR via ONNX Runtime.
 - Editable source text on the left, translated text on the right.
 - Press Return in the source pane to translate again.
 - Click outside the popup to dismiss it.
@@ -20,13 +22,16 @@ It is designed for people who like instant shortcut translation but want a small
 
 Quick watches pasteboard changes instead of global keyboard events for the default shortcut.
 
-1. Select text in any app.
+1. Select text or copy an image in any app.
 2. Hold `cmd` and press `c` twice quickly.
-3. Quick sees two text pasteboard changes while `cmd` is down.
-4. Quick sends the selected text to the configured OpenAI-compatible endpoint.
-5. The popup shows original text and translation side by side.
+3. Quick sees two supported pasteboard changes while `cmd` is down.
+4. If the pasteboard contains text, Quick sends it to the configured OpenAI-compatible endpoint.
+5. If the pasteboard contains image data, Quick runs local OCR with bundled PP-OCRv6 tiny ONNX models.
+6. The popup shows the translation or OCR result.
 
 This avoids the fragile macOS Input Monitoring path for the default gesture. Input Monitoring and Accessibility are only needed if you enable a custom shortcut that simulates copy.
+
+Image OCR runs locally. Image contents are not sent to the configured OpenAI-compatible provider.
 
 ## Settings
 
@@ -90,7 +95,8 @@ The GitHub release workflow builds and uploads `Quick.app.zip` and `Quick.dmg` w
 
 ## Development Notes
 
-- `QuickCore` contains testable logic: copy gesture detection, settings, Keychain access, OpenAI request building, and response parsing.
+- `QuickCore` contains testable logic: copy gesture detection, clipboard routing, OCR text layout, settings, Keychain access, OpenAI request building, and response parsing.
+- `QuickOCR` contains local PP-OCRv6 tiny ONNX Runtime integration.
 - `Quick` contains AppKit/SwiftUI integration: menu bar item, settings window, pasteboard monitor, popup UI.
 - The local packaged app is unsigned. macOS Keychain and privacy permissions may ask again after rebuilds because the binary identity changes.
 
@@ -98,6 +104,7 @@ The GitHub release workflow builds and uploads `Quick.app.zip` and `Quick.dmg` w
 
 ```text
 Sources/QuickCore/      Core logic and tests
+Sources/QuickOCR/       Local ONNX OCR integration
 Sources/Quick/          macOS app UI and system integration
 Tests/QuickCoreTests/   Unit tests
 AppBundle/              Minimal app bundle metadata

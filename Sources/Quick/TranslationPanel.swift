@@ -21,6 +21,10 @@ final class TranslationPanelController {
         show(.loading(source))
     }
 
+    func showOCRLoading() {
+        show(.ocrLoading)
+    }
+
     func showResult(_ text: String) {
         show(.message(text))
     }
@@ -29,12 +33,20 @@ final class TranslationPanelController {
         show(.result(source, translation))
     }
 
+    func showOCRResult(_ text: String) {
+        show(.ocrResult(text))
+    }
+
     func showError(_ message: String) {
         show(.error(nil, message))
     }
 
     func showError(source: String, message: String) {
         show(.error(source, message))
+    }
+
+    func showOCRError(_ message: String) {
+        show(.ocrError(message))
     }
 
     private func show(_ state: TranslationPanelState) {
@@ -141,8 +153,11 @@ private enum TranslationPanelState {
     case ready
     case loading(String)
     case result(String, String)
+    case ocrLoading
+    case ocrResult(String)
     case message(String)
     case error(String?, String)
+    case ocrError(String)
 
     var prefersSplitLayout: Bool {
         switch self {
@@ -150,7 +165,7 @@ private enum TranslationPanelState {
             return true
         case let .error(source, _):
             return source != nil
-        case .ready, .message:
+        case .ready, .ocrLoading, .ocrResult, .message, .ocrError:
             return false
         }
     }
@@ -182,11 +197,19 @@ private struct TranslationPanelView: View {
                     onSubmitSource: onSubmitSource
                 )
             } else {
-                ScrollView {
-                    Text(bodyText)
-                        .font(.system(size: 13))
-                        .textSelection(.enabled)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                if isLoadingOnly {
+                    VStack {
+                        ProgressView()
+                            .controlSize(.small)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                } else {
+                    ScrollView {
+                        Text(bodyText)
+                            .font(.system(size: 13))
+                            .textSelection(.enabled)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
                 }
             }
         }
@@ -203,10 +226,16 @@ private struct TranslationPanelView: View {
             return "Translating"
         case .result:
             return "Translation"
+        case .ocrLoading:
+            return "OCR"
+        case .ocrResult:
+            return "OCR Result"
         case .message:
             return "Quick"
         case .error:
             return "Quick"
+        case .ocrError:
+            return "OCR"
         }
     }
 
@@ -218,9 +247,15 @@ private struct TranslationPanelView: View {
             return "ellipsis.bubble"
         case .result:
             return "character.bubble"
+        case .ocrLoading:
+            return "viewfinder"
+        case .ocrResult:
+            return "text.viewfinder"
         case .message:
             return "character.bubble"
         case .error:
+            return "exclamationmark.triangle"
+        case .ocrError:
             return "exclamationmark.triangle"
         }
     }
@@ -228,15 +263,30 @@ private struct TranslationPanelView: View {
     private var bodyText: String {
         switch state {
         case .ready:
-            return "Select text anywhere, then press cmd+c+c within about one second to translate. The default shortcut watches pasteboard changes and does not need keyboard monitoring."
+            return "Select text or copy an image anywhere, then press cmd+c+c within about one second. Quick translates text and runs local OCR for images."
         case .loading:
             return "Waiting for OpenAI..."
         case let .result(_, text):
+            return text
+        case .ocrLoading:
+            return ""
+        case let .ocrResult(text):
             return text
         case let .message(text):
             return text
         case let .error(_, message):
             return message
+        case let .ocrError(message):
+            return message
+        }
+    }
+
+    private var isLoadingOnly: Bool {
+        switch state {
+        case .ocrLoading:
+            return true
+        case .ready, .loading, .result, .ocrResult, .message, .error, .ocrError:
+            return false
         }
     }
 
@@ -248,7 +298,7 @@ private struct TranslationPanelView: View {
             return (source, translation, false, false)
         case let .error(source?, message):
             return (source, message, true, false)
-        case .ready, .message, .error(nil, _):
+        case .ready, .ocrLoading, .ocrResult, .message, .error(nil, _), .ocrError:
             return nil
         }
     }

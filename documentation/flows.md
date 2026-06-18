@@ -1,22 +1,23 @@
 # Flows
 
-## Default `cmd+c+c` Translation
+## Default `cmd+c+c` Processing
 
-1. User selects text in another app.
+1. User selects text or copies an image in another app.
 2. User holds `cmd` and presses `c` twice.
 3. macOS updates the pasteboard for each copy.
 4. Quick polls pasteboard `changeCount`.
-5. Quick only counts a pasteboard change if the `cmd` key is down and pasteboard text is non-empty.
-6. Two qualifying changes inside the configured interval trigger translation.
-7. Quick reads the pasteboard string.
-8. Quick sends the string as Responses API `input`.
-9. Quick sends the configured System Prompt as Responses API `instructions`.
-10. Quick shows a floating two-column popup.
+5. Quick only counts a pasteboard change if the `cmd` key is down and supported pasteboard content is present.
+6. Two qualifying changes inside the configured interval trigger processing.
+7. Quick reads pasteboard content and routes it by type.
+8. Text content is sent as Responses API `input` with the configured System Prompt as `instructions`.
+9. Image content is processed locally with bundled PP-OCRv6 tiny ONNX models.
+10. Quick shows a floating translation or OCR popup.
 
 Side effects:
 
-- Reads pasteboard text.
-- Sends source text to the configured provider.
+- Reads supported pasteboard content.
+- Sends source text to the configured provider for text translation.
+- Keeps copied image OCR local.
 - Shows a local popup.
 
 ## Manual Translation From Popup
@@ -43,4 +44,3 @@ Side effects:
 
 - Writes secret to Keychain.
 - Writes non-secret configuration to local defaults.
-

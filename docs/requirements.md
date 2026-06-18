@@ -2,11 +2,11 @@
 
 ## Product
 
-Quick is a native macOS menu bar app for fast translation of currently selected text.
+Quick is a native macOS menu bar app for fast translation of currently selected text and local OCR for copied images.
 
 ## User Need
 
-The user wants a lightweight alternative to Deel's shortcut translation workflow while keeping the fast "copy twice to translate" interaction.
+The user wants a lightweight alternative to Deel's shortcut translation workflow while keeping the fast `cmd+c+c` interaction for both copied text and copied images.
 
 ## Functional Requirements
 
@@ -14,11 +14,14 @@ The user wants a lightweight alternative to Deel's shortcut translation workflow
 - Platform: macOS.
 - Implementation language: Swift.
 - App style: menu bar utility, no landing page or main document window.
-- Default shortcut behavior: pressing `cmd+c+c` within a short time window copies the selected text and opens a translation popup.
+- Default shortcut behavior: pressing `cmd+c+c` within a short time window processes supported pasteboard content.
+- If pasteboard content is text, Quick opens a translation popup.
+- If pasteboard content is image data, Quick runs local OCR and opens an OCR result popup.
+- If image data and text/file-path data both exist, image data takes priority.
 - Pasteboard changes only count toward `cmd+c+c` while the `cmd` key is down, so ordinary mouse or trackpad interactions that modify the pasteboard do not trigger translation.
 - Optional custom shortcut behavior: a configured single keyboard shortcut can copy the current selection and then translate it.
 - The first `cmd+c` must keep normal system copy behavior.
-- The app reads text from the system pasteboard after the second copy.
+- The app reads supported content from the system pasteboard after the second copy.
 - The app translates copied text using a user-configured system prompt.
 - Translation provider: OpenAI API.
 - API endpoint base URL is configurable for OpenAI-compatible third-party providers.
@@ -33,11 +36,13 @@ The user wants a lightweight alternative to Deel's shortcut translation workflow
   - Double-copy detection interval.
   - Optional custom single shortcut.
 - Translation result is shown in a lightweight floating popup.
+- OCR result is shown in a lightweight floating popup.
 - Translation popup uses a two-column layout for translations: editable source text on the left, translated text on the right, separated by `｜`.
+- OCR popup shows recognized text directly, without the translation two-column layout.
 - Pressing Return while editing the source text retranslates the current source text.
 - Clicking outside the translation popup closes it.
 - If the API key is missing, Quick opens settings and tells the user to configure it.
-- If the pasteboard has no text, Quick shows a lightweight message.
+- If the pasteboard has no supported text or image content, Quick shows a lightweight message.
 - If macOS permissions are missing, Quick shows guidance for Input Monitoring and Accessibility permissions.
 
 ## Non-Goals For The First Version
@@ -47,7 +52,7 @@ The user wants a lightweight alternative to Deel's shortcut translation workflow
 - Replacing selected text in-place.
 - Full shortcut recorder UI with arbitrary non-keyboard inputs.
 - Translation history.
-- OCR or image translation.
+- Image translation. Images are OCRed locally but not translated automatically in the first OCR version.
 
 ## macOS Permissions
 
