@@ -253,7 +253,7 @@ final class QuickAppModel: NSObject, ObservableObject {
 
         let menu = NSMenu()
         let translateItem = NSMenuItem(
-            title: "Translate Clipboard",
+            title: "Process Clipboard",
             action: #selector(translateClipboardFromMenu),
             keyEquivalent: "t"
         )

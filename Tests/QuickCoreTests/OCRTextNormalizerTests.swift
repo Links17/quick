@@ -22,4 +22,11 @@ final class OCRTextNormalizerTests: XCTestCase {
             "First Line\nSecond Line 42"
         )
     }
+
+    func testRestoresSpacesBetweenAcronymAndTitlecaseWord() {
+        XCTAssertEqual(
+            OCRTextNormalizer.restoreLikelyLatinSpaces("OCRResultText"),
+            "OCR Result Text"
+        )
+    }
 }

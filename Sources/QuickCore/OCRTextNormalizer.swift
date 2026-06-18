@@ -8,8 +8,7 @@ public enum OCRTextNormalizer {
         for index in characters.indices {
             let current = characters[index]
             if index > characters.startIndex {
-                let previous = characters[characters.index(before: index)]
-                if shouldInsertSpace(between: previous, and: current),
+                if shouldInsertSpace(before: index, in: characters),
                    !result.hasSuffix(" "),
                    !result.hasSuffix("\n") {
                     result.append(" ")
@@ -21,8 +20,16 @@ public enum OCRTextNormalizer {
         return result
     }
 
-    private static func shouldInsertSpace(between lhs: Character, and rhs: Character) -> Bool {
+    private static func shouldInsertSpace(before index: Int, in characters: [Character]) -> Bool {
+        let lhs = characters[index - 1]
+        let rhs = characters[index]
+        let next = index + 1 < characters.count ? characters[index + 1] : nil
+
         if lhs.isLowercaseLatin && rhs.isUppercaseLatin {
+            return true
+        }
+
+        if lhs.isUppercaseLatin && rhs.isUppercaseLatin && next?.isLowercaseLatin == true {
             return true
         }
 

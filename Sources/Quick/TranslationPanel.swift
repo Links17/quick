@@ -263,7 +263,7 @@ private struct TranslationPanelView: View {
     private var bodyText: String {
         switch state {
         case .ready:
-            return "Select text anywhere, then press cmd+c+c within about one second to translate. The default shortcut watches pasteboard changes and does not need keyboard monitoring."
+            return "Select text or copy an image anywhere, then press cmd+c+c within about one second. Quick translates text and runs local OCR for images."
         case .loading:
             return "Waiting for OpenAI..."
         case let .result(_, text):
