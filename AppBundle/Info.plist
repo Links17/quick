@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleExecutable</key>
+	<string>Quick</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.links.quick</string>
+	<key>CFBundleName</key>
+	<string>Quick</string>
+	<key>CFBundleDisplayName</key>
+	<string>Quick</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.1.0</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>13.0</string>
+	<key>LSUIElement</key>
+	<true/>
+	<key>NSAccessibilityUsageDescription</key>
+	<string>Quick needs Accessibility permission to detect the double-copy translation shortcut while other apps are focused.</string>
+	<key>NSInputMonitoringUsageDescription</key>
+	<string>Quick needs Input Monitoring permission to detect Command+C pressed twice while other apps are focused.</string>
+</dict>
+</plist>
