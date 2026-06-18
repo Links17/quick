@@ -15,7 +15,14 @@ let package = Package(
         .executable(
             name: "Quick",
             targets: ["Quick"]
+        ),
+        .executable(
+            name: "QuickOCRInspect",
+            targets: ["QuickOCRInspect"]
         )
+    ],
+    dependencies: [
+        .package(url: "https://github.com/microsoft/onnxruntime-swift-package-manager", exact: "1.20.0")
     ],
     targets: [
         .target(
@@ -23,7 +30,17 @@ let package = Package(
         ),
         .executableTarget(
             name: "Quick",
-            dependencies: ["QuickCore"]
+            dependencies: [
+                "QuickCore",
+                .product(name: "onnxruntime", package: "onnxruntime-swift-package-manager")
+            ]
+        ),
+        .executableTarget(
+            name: "QuickOCRInspect",
+            dependencies: [
+                "QuickCore",
+                .product(name: "onnxruntime", package: "onnxruntime-swift-package-manager")
+            ]
         ),
         .testTarget(
             name: "QuickCoreTests",

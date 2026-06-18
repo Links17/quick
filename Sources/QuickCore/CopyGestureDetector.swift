@@ -10,9 +10,9 @@ public struct CopyGestureDetector: Sendable {
     public mutating func registerPasteboardChange(
         at time: TimeInterval,
         isCommandKeyDown: Bool,
-        hasText: Bool
+        hasSupportedContent: Bool
     ) -> Bool {
-        guard isCommandKeyDown, hasText else {
+        guard isCommandKeyDown, hasSupportedContent else {
             detector.reset()
             return false
         }

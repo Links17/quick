@@ -21,6 +21,7 @@ final class QuickAppModel: NSObject, ObservableObject {
     private let settingsStore: SettingsStore
     private let keychainStore: KeychainStore
     private let translator: OpenAITranslator
+    private let ocrService: OCRService
     private let pasteboardReader: PasteboardReader
     private let panelController: TranslationPanelController
     private var copyGestureDetector: CopyGestureDetector
@@ -35,12 +36,14 @@ final class QuickAppModel: NSObject, ObservableObject {
         settingsStore: SettingsStore = SettingsStore(),
         keychainStore: KeychainStore = KeychainStore(),
         translator: OpenAITranslator = OpenAITranslator(),
+        ocrService: OCRService = QuickAppModel.makeDefaultOCRService(),
         pasteboardReader: PasteboardReader = PasteboardReader(),
         panelController: TranslationPanelController = TranslationPanelController()
     ) {
         self.settingsStore = settingsStore
         self.keychainStore = keychainStore
         self.translator = translator
+        self.ocrService = ocrService
         self.pasteboardReader = pasteboardReader
         self.panelController = panelController
 
@@ -55,6 +58,10 @@ final class QuickAppModel: NSObject, ObservableObject {
                 await self?.translateText(text)
             }
         }
+    }
+
+    private static func makeDefaultOCRService() -> OCRService {
+        (try? PaddleONNXOCRService()) ?? PlaceholderOCRService()
     }
 
     func start() {
@@ -113,8 +120,19 @@ final class QuickAppModel: NSObject, ObservableObject {
             return
         }
 
-        let copiedText = pasteboardReader.readString()
-        await translateText(copiedText)
+        let content = pasteboardReader.readContent()
+        await handleClipboardContent(content)
+    }
+
+    func handleClipboardContent(_ content: ClipboardContent) async {
+        switch ClipboardActionRouter.route(content) {
+        case let .translate(text):
+            await translateText(text)
+        case let .recognizeImage(data):
+            await recognizeImage(data)
+        case .ignore:
+            panelController.showError(TranslationError.emptyText.localizedDescription)
+        }
     }
 
     func translateText(_ sourceText: String) async {
@@ -152,6 +170,29 @@ final class QuickAppModel: NSObject, ObservableObject {
         }
     }
 
+    func recognizeImage(_ imageData: Data) async {
+        if isTranslating {
+            return
+        }
+        isTranslating = true
+        defer {
+            isTranslating = false
+        }
+
+        panelController.showLoading(source: "Image OCR")
+
+        do {
+            let recognizedText = try await ocrService.recognizeText(in: imageData)
+            let trimmedText = recognizedText.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmedText.isEmpty else {
+                throw OCRError.emptyResult
+            }
+            panelController.showResult(source: "Image OCR", translation: trimmedText)
+        } catch {
+            panelController.showError(source: "Image OCR", message: error.localizedDescription)
+        }
+    }
+
     private func installGlobalCopyMonitor() {
         if let eventMonitor {
             NSEvent.removeMonitor(eventMonitor)
@@ -183,14 +224,14 @@ final class QuickAppModel: NSObject, ObservableObject {
 
         lastPasteboardChangeCount = currentChangeCount
 
-        let copiedText = pasteboardReader.readString()
-        let hasText = !copiedText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        let content = pasteboardReader.readContent()
+        let hasSupportedContent = content.hasSupportedContent
         let isCommandKeyDown = CGEventSource.flagsState(.combinedSessionState).contains(.maskCommand)
 
         if copyGestureDetector.registerPasteboardChange(
             at: Date().timeIntervalSinceReferenceDate,
             isCommandKeyDown: isCommandKeyDown,
-            hasText: hasText
+            hasSupportedContent: hasSupportedContent
         ) {
             Task {
                 await translateCopiedText()

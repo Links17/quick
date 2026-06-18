@@ -18,6 +18,7 @@ app: icon
 	cp .build/release/Quick dist/Quick.app/Contents/MacOS/Quick
 	cp AppBundle/Info.plist dist/Quick.app/Contents/Info.plist
 	cp AppBundle/Quick.icns dist/Quick.app/Contents/Resources/Quick.icns
+	cp -R AppBundle/Resources/. dist/Quick.app/Contents/Resources/
 	chmod +x dist/Quick.app/Contents/MacOS/Quick
 
 zip: app
