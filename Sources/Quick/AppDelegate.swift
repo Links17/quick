@@ -252,57 +252,10 @@ final class QuickAppModel: NSObject, ObservableObject {
     }
 
     private func makeStatusBarIcon() -> NSImage {
-        let size = NSSize(width: 20, height: 18)
-        let image = NSImage(size: size, flipped: false) { rect in
-            let lineWidth: CGFloat = 1.95
-            NSColor.black.setStroke()
-
-            let mark = NSBezierPath()
-            mark.move(to: NSPoint(x: 14.7, y: 5.7))
-            mark.curve(
-                to: NSPoint(x: 10.3, y: 2.8),
-                controlPoint1: NSPoint(x: 13.6, y: 3.7),
-                controlPoint2: NSPoint(x: 12.2, y: 2.8)
-            )
-            mark.curve(
-                to: NSPoint(x: 4.0, y: 8.5),
-                controlPoint1: NSPoint(x: 6.6, y: 2.8),
-                controlPoint2: NSPoint(x: 4.0, y: 5.2)
-            )
-            mark.curve(
-                to: NSPoint(x: 9.8, y: 15.1),
-                controlPoint1: NSPoint(x: 4.0, y: 12.2),
-                controlPoint2: NSPoint(x: 6.5, y: 15.1)
-            )
-            mark.curve(
-                to: NSPoint(x: 15.8, y: 9.0),
-                controlPoint1: NSPoint(x: 13.3, y: 15.1),
-                controlPoint2: NSPoint(x: 15.8, y: 12.5)
-            )
-            mark.curve(
-                to: NSPoint(x: 12.9, y: 5.0),
-                controlPoint1: NSPoint(x: 15.8, y: 7.1),
-                controlPoint2: NSPoint(x: 14.8, y: 5.7)
-            )
-            mark.lineWidth = lineWidth
-            mark.lineCapStyle = .round
-            mark.lineJoinStyle = .round
-            mark.stroke()
-
-            let tail = NSBezierPath()
-            tail.move(to: NSPoint(x: 11.9, y: 5.4))
-            tail.curve(
-                to: NSPoint(x: 16.4, y: 2.1),
-                controlPoint1: NSPoint(x: 12.8, y: 4.0),
-                controlPoint2: NSPoint(x: 14.5, y: 3.1)
-            )
-            tail.lineWidth = lineWidth
-            tail.lineCapStyle = .round
-            tail.lineJoinStyle = .round
-            tail.stroke()
-
-            return true
-        }
+        let image = NSImage(systemSymbolName: "character.bubble", accessibilityDescription: "Quick")
+            ?? NSImage(systemSymbolName: "text.bubble", accessibilityDescription: "Quick")
+            ?? NSImage(size: NSSize(width: 18, height: 18))
+        image.size = NSSize(width: 18, height: 18)
         image.isTemplate = true
         image.accessibilityDescription = "Quick"
         return image
