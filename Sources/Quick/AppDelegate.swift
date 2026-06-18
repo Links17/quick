@@ -1,5 +1,6 @@
 import AppKit
 import ApplicationServices
+import CoreText
 import QuickCore
 import SwiftUI
 
@@ -203,7 +204,7 @@ final class QuickAppModel: NSObject, ObservableObject {
             return
         }
 
-        let item = NSStatusBar.system.statusItem(withLength: 28)
+        let item = NSStatusBar.system.statusItem(withLength: 24)
         item.button?.image = makeStatusBarIcon()
         item.button?.imagePosition = .imageOnly
         item.button?.title = ""
@@ -252,32 +253,41 @@ final class QuickAppModel: NSObject, ObservableObject {
     }
 
     private func makeStatusBarIcon() -> NSImage {
-        let size = NSSize(width: 22, height: 18)
+        let size = NSSize(width: 20, height: 18)
         let image = NSImage(size: size, flipped: false) { rect in
-            let tile = NSRect(x: 1, y: 1, width: rect.width - 2, height: rect.height - 2)
-            let path = NSBezierPath(roundedRect: tile, xRadius: 5, yRadius: 5)
-            NSColor.white.setFill()
-            path.fill()
-            NSColor.black.withAlphaComponent(0.10).setStroke()
-            path.lineWidth = 0.8
-            path.stroke()
+            guard let context = NSGraphicsContext.current?.cgContext else {
+                return false
+            }
 
-            let font = NSFont.systemFont(ofSize: 13, weight: .bold)
-            let text = NSAttributedString(
-                string: "Q",
-                attributes: [
-                    .font: font,
-                    .foregroundColor: NSColor(calibratedWhite: 0.48, alpha: 1.0),
-                ]
-            )
-            let textSize = text.size()
-            text.draw(at: NSPoint(
-                x: rect.midX - textSize.width / 2,
-                y: rect.midY - textSize.height / 2 - 0.5
-            ))
+            let font = CTFontCreateWithName("HelveticaNeue-Bold" as CFString, 18, nil)
+            var character: UniChar = 81
+            var glyph = CGGlyph()
+            guard CTFontGetGlyphsForCharacters(font, &character, &glyph, 1),
+                  let glyphPath = CTFontCreatePathForGlyph(font, glyph, nil) else {
+                return false
+            }
+
+            let bounds = glyphPath.boundingBoxOfPath
+            let target = rect.insetBy(dx: 1.8, dy: 1.2)
+            let scale = min(target.width / bounds.width, target.height / bounds.height)
+            var transform = CGAffineTransform.identity
+                .translatedBy(x: target.midX, y: target.midY)
+                .scaledBy(x: scale, y: scale)
+                .translatedBy(x: -bounds.midX, y: -bounds.midY)
+
+            guard let path = glyphPath.copy(using: &transform) else {
+                return false
+            }
+
+            context.addPath(path)
+            context.setStrokeColor(NSColor.black.cgColor)
+            context.setLineWidth(1.6)
+            context.setLineCap(.round)
+            context.setLineJoin(.round)
+            context.strokePath()
             return true
         }
-        image.isTemplate = false
+        image.isTemplate = true
         image.accessibilityDescription = "Quick"
         return image
     }
