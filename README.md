@@ -11,7 +11,7 @@ Quick is a lightweight macOS menu bar translator and OCR utility built around on
 
 It is designed for people who like instant shortcut translation but want a small native Swift app with configurable OpenAI-compatible providers and on-device image OCR.
 
-![Quick macOS translator and OCR preview](docs/assets/quick-preview.png)
+![Quick macOS cmd+c+c translation and local OCR demo](docs/assets/quick-demo.gif)
 
 ## Download
 
