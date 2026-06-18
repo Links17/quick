@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Quick OCR - Local copied-image text recognition for macOS</title>
+    <meta name="description" content="How Quick routes copied images to local PP-OCRv6 tiny OCR with ONNX Runtime while keeping text translation on OpenAI-compatible APIs.">
+    <link rel="canonical" href="https://links17.github.io/quick/ocr.html">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Quick OCR - Local copied-image text recognition for macOS">
+    <meta property="og:description" content="Quick runs copied-image OCR locally with PP-OCRv6 tiny and ONNX Runtime.">
+    <meta property="og:image" content="https://links17.github.io/quick/assets/quick-og.png">
+    <link rel="icon" type="image/png" href="assets/quick-icon.png">
+    <style>
+      :root {
+        --ink: #111315;
+        --muted: #59615d;
+        --paper: #f4f5f2;
+        --panel: #ffffff;
+        --line: #d9ddd7;
+        --green: #17643e;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--paper);
+        line-height: 1.6;
+      }
+
+      header,
+      main {
+        width: min(920px, calc(100% - 40px));
+        margin: 0 auto;
+      }
+
+      header {
+        padding: 36px 0 24px;
+      }
+
+      a {
+        color: var(--green);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--muted);
+        text-decoration: none;
+        font-weight: 650;
+      }
+
+      .brand img {
+        width: 30px;
+        height: 30px;
+        border-radius: 7px;
+      }
+
+      h1 {
+        margin: 44px 0 14px;
+        font-size: 46px;
+        line-height: 1.05;
+        letter-spacing: 0;
+      }
+
+      .lead {
+        margin: 0;
+        color: var(--muted);
+        font-size: 20px;
+      }
+
+      section {
+        padding: 30px 0;
+        border-top: 1px solid var(--line);
+      }
+
+      h2 {
+        margin: 0 0 14px;
+        font-size: 26px;
+        letter-spacing: 0;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--panel);
+        border: 1px solid var(--line);
+      }
+
+      th,
+      td {
+        text-align: left;
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+      }
+
+      th {
+        background: #e8ece6;
+      }
+
+      code,
+      pre {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+
+      pre {
+        overflow-x: auto;
+        padding: 16px;
+        border-radius: 8px;
+        background: #111315;
+        color: #eef3ec;
+      }
+
+      ul,
+      ol {
+        padding-left: 24px;
+      }
+
+      footer {
+        width: min(920px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 28px 0 42px;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a class="brand" href="./">
+        <img src="assets/quick-icon.png" alt="">
+        <span>Quick</span>
+      </a>
+      <h1>Local OCR for copied images</h1>
+      <p class="lead">Quick v0.2.0 adds on-device OCR while keeping the same cmd+c+c workflow for text translation.</p>
+    </header>
+
+    <main>
+      <section>
+        <h2>User flow</h2>
+        <ol>
+          <li>Copy an image or screenshot in any macOS app.</li>
+          <li>Hold cmd and press c twice quickly.</li>
+          <li>Quick reads image data from the system pasteboard.</li>
+          <li>Quick runs OCR locally.</li>
+          <li>Quick shows recognized text in the floating popup.</li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>Routing</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Clipboard content</th>
+              <th>Behavior</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Text</td>
+              <td>Sent to the configured OpenAI-compatible provider for translation.</td>
+            </tr>
+            <tr>
+              <td>Image data</td>
+              <td>Processed locally with OCR.</td>
+            </tr>
+            <tr>
+              <td>Image data plus text or file path</td>
+              <td>Image data takes priority.</td>
+            </tr>
+            <tr>
+              <td>Empty or unsupported content</td>
+              <td>Quick shows a lightweight error message.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Privacy</h2>
+        <p>Image OCR runs on device. Copied images are not sent to OpenAI or third-party API providers. Only text translation uses the configured API key, Base URL, model, and System Prompt.</p>
+      </section>
+
+      <section>
+        <h2>Implementation</h2>
+        <p>OCR is implemented in Swift with ONNX Runtime and bundled PP-OCRv6 tiny models.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Asset</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>ppocrv6_tiny_det.onnx</code></td>
+              <td>Text detection model.</td>
+            </tr>
+            <tr>
+              <td><code>ppocrv6_tiny_rec.onnx</code></td>
+              <td>Text recognition model.</td>
+            </tr>
+            <tr>
+              <td><code>ppocrv6_tiny_det.yml</code></td>
+              <td>Detection metadata.</td>
+            </tr>
+            <tr>
+              <td><code>ppocrv6_tiny_rec.yml</code></td>
+              <td>Recognition metadata and character dictionary.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Verification</h2>
+        <pre>swift test
+swift run QuickOCRInspect inspect AppBundle/Resources/OCR
+swift run QuickOCRInspect recognize AppBundle/Resources/OCR /path/to/image.png</pre>
+      </section>
+
+      <section>
+        <h2>Current limits</h2>
+        <ul>
+          <li>OCR quality is aimed at clear screenshots, UI text, and document text.</li>
+          <li>Image OCR does not automatically translate recognized text in v0.2.0.</li>
+          <li>The first OCR release uses a lightweight Swift DB postprocessor with axis-aligned crops, not full PaddleOCR rotated box postprocessing.</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer>
+      <a href="https://github.com/Links17/quick">GitHub repository</a>
+    </footer>
+  </body>
+</html>

@@ -1,8 +1,23 @@
 # Quick
 
+Native macOS `cmd+c+c` translation with local OCR.
+
+[![CI](https://github.com/Links17/quick/actions/workflows/ci.yml/badge.svg)](https://github.com/Links17/quick/actions/workflows/ci.yml)
+[![GitHub release](https://img.shields.io/github/v/release/Links17/quick)](https://github.com/Links17/quick/releases/latest)
+[![License: MIT](https://img.shields.io/badge/license-MIT-111315.svg)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/Links17/quick?style=social)](https://github.com/Links17/quick/stargazers)
+
 Quick is a lightweight macOS menu bar translator and OCR utility built around one gesture: copy text or an image anywhere, press `cmd+c+c`, and get a focused popup.
 
-It is designed for people who like instant shortcut translation but want a small native tool with configurable OpenAI-compatible providers.
+It is designed for people who like instant shortcut translation but want a small native Swift app with configurable OpenAI-compatible providers and on-device image OCR.
+
+![Quick macOS translator and OCR preview](docs/assets/quick-preview.png)
+
+## Download
+
+Download the latest DMG from [GitHub Releases](https://github.com/Links17/quick/releases/latest).
+
+Project site: [links17.github.io/quick](https://links17.github.io/quick/)
 
 ## Highlights
 
