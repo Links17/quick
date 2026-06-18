@@ -11,16 +11,10 @@ struct PasteboardReader {
     }
 
     func readContent() -> ClipboardContent {
-        if let value = NSPasteboard.general.string(forType: .string),
-           !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return .text(value)
-        }
-
-        if let imageData = readImageData() {
-            return .imageData(imageData)
-        }
-
-        return .text("")
+        ClipboardContent.resolve(
+            text: NSPasteboard.general.string(forType: .string),
+            imageData: readImageData()
+        )
     }
 
     private func readImageData() -> Data? {

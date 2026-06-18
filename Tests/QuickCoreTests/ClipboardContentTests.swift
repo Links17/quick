@@ -17,4 +17,25 @@ final class ClipboardContentTests: XCTestCase {
     func testImageContentIsUnsupportedWhenDataIsEmpty() {
         XCTAssertFalse(ClipboardContent.imageData(Data()).hasSupportedContent)
     }
+
+    func testResolvePrefersImageDataOverTextWhenBothExist() {
+        let content = ClipboardContent.resolve(
+            text: "/tmp/copied-image.png",
+            imageData: Data([1, 2, 3])
+        )
+
+        XCTAssertEqual(content, .imageData(Data([1, 2, 3])))
+    }
+
+    func testResolveFallsBackToNonEmptyText() {
+        let content = ClipboardContent.resolve(text: "Hello", imageData: nil)
+
+        XCTAssertEqual(content, .text("Hello"))
+    }
+
+    func testResolveReturnsEmptyTextWhenNoSupportedContentExists() {
+        let content = ClipboardContent.resolve(text: "  ", imageData: Data())
+
+        XCTAssertEqual(content, .text(""))
+    }
 }

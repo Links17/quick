@@ -180,7 +180,7 @@ final class QuickAppModel: NSObject, ObservableObject {
             isTranslating = false
         }
 
-        panelController.showLoading(source: "Image OCR")
+        panelController.showOCRLoading()
 
         do {
             let recognizedText = try await ocrService.recognizeText(in: imageData)
@@ -188,9 +188,9 @@ final class QuickAppModel: NSObject, ObservableObject {
             guard !trimmedText.isEmpty else {
                 throw OCRError.emptyResult
             }
-            panelController.showResult(source: "Image OCR", translation: trimmedText)
+            panelController.showOCRResult(trimmedText)
         } catch {
-            panelController.showError(source: "Image OCR", message: error.localizedDescription)
+            panelController.showOCRError(error.localizedDescription)
         }
     }
 
