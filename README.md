@@ -100,6 +100,8 @@ The GitHub release workflow builds and uploads `Quick.app.zip` and `Quick.dmg` w
 - `Quick` contains AppKit/SwiftUI integration: menu bar item, settings window, pasteboard monitor, popup UI.
 - The local packaged app is unsigned. macOS Keychain and privacy permissions may ask again after rebuilds because the binary identity changes.
 
+OCR implementation notes live in [docs/ocr.md](docs/ocr.md).
+
 ## Project Structure
 
 ```text
