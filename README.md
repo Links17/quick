@@ -74,7 +74,19 @@ Create a release zip:
 make zip
 ```
 
-The GitHub release workflow builds and uploads `Quick.app.zip` whenever a `v*` tag is pushed.
+Create a DMG:
+
+```bash
+make dmg
+```
+
+Install locally:
+
+```bash
+make install
+```
+
+The GitHub release workflow builds and uploads `Quick.app.zip` and `Quick.dmg` whenever a `v*` tag is pushed.
 
 ## Development Notes
 

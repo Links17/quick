@@ -1,4 +1,4 @@
-.PHONY: build test app zip clean
+.PHONY: build test app zip dmg install clean
 
 build:
 	swift build
@@ -17,6 +17,18 @@ app:
 
 zip: app
 	cd dist && ditto -c -k --sequesterRsrc --keepParent Quick.app Quick.app.zip
+
+dmg: app
+	rm -rf dist/dmg-root
+	mkdir -p dist/dmg-root
+	cp -R dist/Quick.app dist/dmg-root/Quick.app
+	ln -s /Applications dist/dmg-root/Applications
+	rm -f dist/Quick.dmg
+	hdiutil create -volname Quick -srcfolder dist/dmg-root -ov -format UDZO dist/Quick.dmg
+
+install: app
+	rm -rf /Applications/Quick.app
+	cp -R dist/Quick.app /Applications/Quick.app
 
 clean:
 	rm -rf .build dist
