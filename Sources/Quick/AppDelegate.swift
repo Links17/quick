@@ -258,7 +258,7 @@ final class QuickAppModel: NSObject, ObservableObject {
             let path = NSBezierPath(roundedRect: tile, xRadius: 5, yRadius: 5)
             NSColor.white.setFill()
             path.fill()
-            NSColor.black.withAlphaComponent(0.18).setStroke()
+            NSColor.black.withAlphaComponent(0.10).setStroke()
             path.lineWidth = 0.8
             path.stroke()
 
@@ -267,7 +267,7 @@ final class QuickAppModel: NSObject, ObservableObject {
                 string: "Q",
                 attributes: [
                     .font: font,
-                    .foregroundColor: NSColor.black,
+                    .foregroundColor: NSColor(calibratedWhite: 0.48, alpha: 1.0),
                 ]
             )
             let textSize = text.size()
