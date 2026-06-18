@@ -1,6 +1,5 @@
 import AppKit
 import ApplicationServices
-import CoreText
 import QuickCore
 import SwiftUI
 
@@ -255,36 +254,22 @@ final class QuickAppModel: NSObject, ObservableObject {
     private func makeStatusBarIcon() -> NSImage {
         let size = NSSize(width: 20, height: 18)
         let image = NSImage(size: size, flipped: false) { rect in
-            guard let context = NSGraphicsContext.current?.cgContext else {
-                return false
-            }
+            let lineWidth: CGFloat = 2.05
+            let ring = NSBezierPath(ovalIn: NSRect(x: 3.1, y: 3.0, width: 12.4, height: 12.4))
+            ring.lineWidth = lineWidth
+            ring.lineCapStyle = .round
+            ring.lineJoinStyle = .round
+            NSColor.black.setStroke()
+            ring.stroke()
 
-            let font = CTFontCreateWithName("HelveticaNeue-Bold" as CFString, 18, nil)
-            var character: UniChar = 81
-            var glyph = CGGlyph()
-            guard CTFontGetGlyphsForCharacters(font, &character, &glyph, 1),
-                  let glyphPath = CTFontCreatePathForGlyph(font, glyph, nil) else {
-                return false
-            }
+            let tail = NSBezierPath()
+            tail.move(to: NSPoint(x: 12.7, y: 5.0))
+            tail.line(to: NSPoint(x: 16.3, y: 1.8))
+            tail.lineWidth = lineWidth
+            tail.lineCapStyle = .round
+            tail.lineJoinStyle = .round
+            tail.stroke()
 
-            let bounds = glyphPath.boundingBoxOfPath
-            let target = rect.insetBy(dx: 1.8, dy: 1.2)
-            let scale = min(target.width / bounds.width, target.height / bounds.height)
-            var transform = CGAffineTransform.identity
-                .translatedBy(x: target.midX, y: target.midY)
-                .scaledBy(x: scale, y: scale)
-                .translatedBy(x: -bounds.midX, y: -bounds.midY)
-
-            guard let path = glyphPath.copy(using: &transform) else {
-                return false
-            }
-
-            context.addPath(path)
-            context.setStrokeColor(NSColor.black.cgColor)
-            context.setLineWidth(1.6)
-            context.setLineCap(.round)
-            context.setLineJoin(.round)
-            context.strokePath()
             return true
         }
         image.isTemplate = true
