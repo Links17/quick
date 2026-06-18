@@ -24,4 +24,26 @@ final class CTCLabelDecoderTests: XCTestCase {
 
         XCTAssertEqual(text, "ab")
     }
+
+    func testDecodesLongBlankRunsAsSpaces() {
+        let decoder = CTCLabelDecoder(characterDictionary: ["a", "b"])
+
+        let text = decoder.decode(
+            indices: [1, 1, 0, 2, 2, 0, 0, 0, 1],
+            spaceBlankRunThreshold: 3
+        )
+
+        XCTAssertEqual(text, "ab a")
+    }
+
+    func testDoesNotInsertSpacesForLeadingOrTrailingBlankRuns() {
+        let decoder = CTCLabelDecoder(characterDictionary: ["a", "b"])
+
+        let text = decoder.decode(
+            indices: [0, 0, 0, 1, 0, 0, 0],
+            spaceBlankRunThreshold: 3
+        )
+
+        XCTAssertEqual(text, "a")
+    }
 }

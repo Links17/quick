@@ -53,13 +53,17 @@ public final class PaddleONNXOCRService: OCRService, @unchecked Sendable {
             }
         }
 
-        let texts = try candidateImages.map { candidate in
+        let items = try zip(candidateImages, boxes.isEmpty ? [OCRTextBox(rect: CGRect(x: 0, y: 0, width: cgImage.width, height: cgImage.height), score: 1)] : boxes).map { candidate, box in
             let tensor = try Self.makeRecognitionInputTensor(from: candidate)
             let output = try runRecognition(tensor: tensor)
-            return recDecoder.decode(logits: output).trimmingCharacters(in: .whitespacesAndNewlines)
-        }.filter { !$0.isEmpty }
+            let text = recDecoder.decode(
+                logits: output,
+                spaceBlankRunThreshold: 3
+            ).trimmingCharacters(in: .whitespacesAndNewlines)
+            return OCRTextItem(text: text, box: box)
+        }
 
-        let text = texts.joined(separator: "\n")
+        let text = OCRTextNormalizer.restoreLikelyLatinSpaces(OCRTextLayout.format(items))
         guard !text.isEmpty else {
             throw OCRError.emptyResult
         }
