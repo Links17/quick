@@ -16,6 +16,13 @@ final class OCRTextNormalizerTests: XCTestCase {
         )
     }
 
+    func testRemovesLayoutSpacesBetweenChineseCharacters() {
+        XCTAssertEqual(
+            OCRTextNormalizer.restoreLikelyLatinSpaces("你 好 世 界\n中 文识别 测试"),
+            "你好世界\n中文识别测试"
+        )
+    }
+
     func testPreservesExistingWhitespaceAndNewlines() {
         XCTAssertEqual(
             OCRTextNormalizer.restoreLikelyLatinSpaces("FirstLine\nSecondLine42"),

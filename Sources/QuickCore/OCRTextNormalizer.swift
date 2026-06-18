@@ -17,6 +17,25 @@ public enum OCRTextNormalizer {
             result.append(current)
         }
 
+        return removeSpacesBetweenCJKCharacters(result)
+    }
+
+    private static func removeSpacesBetweenCJKCharacters(_ text: String) -> String {
+        let characters = Array(text)
+        var result = ""
+
+        for index in characters.indices {
+            let current = characters[index]
+            if current == " ",
+               index > characters.startIndex,
+               index + 1 < characters.count,
+               characters[index - 1].isCJKUnifiedIdeograph,
+               characters[index + 1].isCJKUnifiedIdeograph {
+                continue
+            }
+            result.append(current)
+        }
+
         return result
     }
 
@@ -65,5 +84,15 @@ private extension Character {
             return false
         }
         return ("A"..."Z").contains(Character(scalar))
+    }
+
+    var isCJKUnifiedIdeograph: Bool {
+        guard let value = unicodeScalars.first?.value, unicodeScalars.count == 1 else {
+            return false
+        }
+
+        return (0x3400...0x4DBF).contains(value)
+            || (0x4E00...0x9FFF).contains(value)
+            || (0xF900...0xFAFF).contains(value)
     }
 }

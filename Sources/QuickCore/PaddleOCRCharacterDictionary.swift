@@ -6,7 +6,7 @@ public enum PaddleOCRCharacterDictionary {
         var characters: [String] = []
 
         for rawLine in yaml.components(separatedBy: .newlines) {
-            let trimmed = rawLine.trimmingCharacters(in: .whitespaces)
+            let trimmed = rawLine.trimmingCharacters(in: .yamlIndentation)
 
             if trimmed == "character_dict:" {
                 isInDictionary = true
@@ -43,4 +43,8 @@ public enum PaddleOCRCharacterDictionary {
         }
         return value
     }
+}
+
+private extension CharacterSet {
+    static let yamlIndentation = CharacterSet(charactersIn: " \t\r")
 }

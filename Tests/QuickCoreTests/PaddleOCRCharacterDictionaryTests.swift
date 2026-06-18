@@ -18,6 +18,22 @@ final class PaddleOCRCharacterDictionaryTests: XCTestCase {
         XCTAssertEqual(dictionary, ["!", "A", "你", "\\"])
     }
 
+    func testParsesFullWidthSpaceWithoutStoppingDictionary() throws {
+        let yaml = """
+        PostProcess:
+          name: CTCLabelDecode
+          character_dict:
+          - A
+          - 　
+          - 你
+          - 好
+        """
+
+        let dictionary = try PaddleOCRCharacterDictionary.parse(yaml)
+
+        XCTAssertEqual(dictionary, ["A", "　", "你", "好"])
+    }
+
     func testThrowsWhenCharacterDictionaryIsMissing() {
         XCTAssertThrowsError(try PaddleOCRCharacterDictionary.parse("PostProcess: {}"))
     }
