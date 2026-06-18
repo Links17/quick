@@ -1,4 +1,4 @@
-.PHONY: build test app clean
+.PHONY: build test app zip clean
 
 build:
 	swift build
@@ -14,6 +14,9 @@ app:
 	cp .build/release/Quick dist/Quick.app/Contents/MacOS/Quick
 	cp AppBundle/Info.plist dist/Quick.app/Contents/Info.plist
 	chmod +x dist/Quick.app/Contents/MacOS/Quick
+
+zip: app
+	cd dist && ditto -c -k --sequesterRsrc --keepParent Quick.app Quick.app.zip
 
 clean:
 	rm -rf .build dist

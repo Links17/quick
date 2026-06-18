@@ -68,6 +68,14 @@ make app
 open dist/Quick.app
 ```
 
+Create a release zip:
+
+```bash
+make zip
+```
+
+The GitHub release workflow builds and uploads `Quick.app.zip` whenever a `v*` tag is pushed.
+
 ## Development Notes
 
 - `QuickCore` contains testable logic: copy gesture detection, settings, Keychain access, OpenAI request building, and response parsing.
@@ -93,3 +101,6 @@ Current verification command:
 swift test
 ```
 
+## License
+
+MIT
