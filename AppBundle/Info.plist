@@ -10,6 +10,8 @@
 	<string>Quick</string>
 	<key>CFBundleDisplayName</key>
 	<string>Quick</string>
+	<key>CFBundleIconFile</key>
+	<string>Quick</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

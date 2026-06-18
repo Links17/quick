@@ -203,9 +203,11 @@ final class QuickAppModel: NSObject, ObservableObject {
             return
         }
 
-        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        item.button?.image = NSImage(systemSymbolName: "character.bubble", accessibilityDescription: "Quick")
-        item.button?.title = " Quick"
+        let item = NSStatusBar.system.statusItem(withLength: 24)
+        item.button?.image = nil
+        item.button?.title = "Q"
+        item.button?.font = .systemFont(ofSize: NSFont.systemFontSize, weight: .semibold)
+        item.button?.toolTip = "Quick"
 
         let menu = NSMenu()
         let translateItem = NSMenuItem(

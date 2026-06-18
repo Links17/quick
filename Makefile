@@ -1,4 +1,4 @@
-.PHONY: build test app zip dmg install clean
+.PHONY: build test icon app zip dmg install clean
 
 build:
 	swift build
@@ -6,13 +6,18 @@ build:
 test:
 	swift test
 
-app:
+icon:
+	swift Scripts/generate_icon.swift AppBundle
+	iconutil -c icns AppBundle/Quick.iconset -o AppBundle/Quick.icns
+
+app: icon
 	swift build -c release
 	rm -rf dist/Quick.app
 	mkdir -p dist/Quick.app/Contents/MacOS
 	mkdir -p dist/Quick.app/Contents/Resources
 	cp .build/release/Quick dist/Quick.app/Contents/MacOS/Quick
 	cp AppBundle/Info.plist dist/Quick.app/Contents/Info.plist
+	cp AppBundle/Quick.icns dist/Quick.app/Contents/Resources/Quick.icns
 	chmod +x dist/Quick.app/Contents/MacOS/Quick
 
 zip: app
@@ -31,4 +36,4 @@ install: app
 	cp -R dist/Quick.app /Applications/Quick.app
 
 clean:
-	rm -rf .build dist
+	rm -rf .build dist AppBundle/Quick.iconset AppBundle/Quick.icns

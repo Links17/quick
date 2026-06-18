@@ -4,3 +4,4 @@ dist/
 DerivedData/
 *.xcuserdata/
 .DS_Store
+AppBundle/Quick.iconset/
